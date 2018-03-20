@@ -1,6 +1,6 @@
 from win32com.client.gencache import EnsureDispatch as Dispatch
 import os
-import codecs
+import sys
 
 outlook = Dispatch("Outlook.Application")
 mapi = outlook.GetNamespace("MAPI")
@@ -31,13 +31,23 @@ def mkdir_p(path):
     except:
         pass
 
-def saveEmails(folder, mailPath):
-    for inx, mail in Oli(folder.Items).items():
+def saveEmails(folder, mailPath, maxCount):
+    count = folder.Items.Count
+    for i, mail in Oli(folder.Items).items():
         if mail.Attachments.Count == 0:
             continue
 
+        if (i >= maxCount):
+            break
+
         try:
             name = "{} {} - {}".format(mail.CreationTime.Format("%Y-%m-%d"), mail.Sender.Name, mail.Sender.Address)
+
+            # write status
+            sys.stdout.write((" "*100) + "\r")
+            sys.stdout.write("{}: {}/{} {}\r".format(folder.Name, i, count, name))
+            sys.stdout.flush()
+
             if os.path.exists(mailPath + '/' + name):
                 # print("Skip {}".format(name))
                 continue
@@ -65,8 +75,9 @@ def saveEmails(folder, mailPath):
 internResumes = mapi.Folders[2].Folders[2].Folders[1].Folders[1]
 resumes = mapi.Folders[2].Folders[2].Folders[1].Folders[2]
 
-saveEmails(internResumes, os.environ['HOME'] + "/NextCloud/ResumeUploads")
-saveEmails(internResumes, os.environ['HOME'] + "/NextCloud/InternResumeUploads")
+# Do not save resumes.  Auto responder gets triggered.
+#saveEmails(resumes, os.environ['HOME'] + "/NextCloud/ResumeUploads", 100)
+saveEmails(internResumes, os.environ['HOME'] + "/NextCloud/InternResumeUploads", 100)
 
 # saveEmails(internResumes, os.getcwd() + "/Nextcloud/ResumeUploads")
 # saveEmails(internResumes, os.getcwd() + "/Nextcloud/InternResumeUploads")
