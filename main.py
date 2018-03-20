@@ -37,14 +37,14 @@ def saveEmails(folder, mailPath):
             continue
 
         try:
-            name = "{} {} - {}".format(mail.CreationTime.strftime("%Y-%m-%d"), mail.Sender.Name, mail.Sender.Address)
+            name = "{} {} - {}".format(mail.CreationTime.Format("%Y-%m-%d"), mail.Sender.Name, mail.Sender.Address)
             if os.path.exists(mailPath + '/' + name):
                 # print("Skip {}".format(name))
                 continue
 
             mkdir_p(mailPath + '/' + name)
 
-            # print(name)
+            print(name)
             # print(mail.Body)
 
             path = mailPath + '/' + name
